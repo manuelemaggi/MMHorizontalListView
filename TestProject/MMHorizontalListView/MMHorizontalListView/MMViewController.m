@@ -36,12 +36,12 @@
 
 - (NSUInteger)MMHorizontalListViewNumberOfCells:(MMHorizontalListView *)horizontalListView {
     
-    return 20;
+    return 100;
 }
 
 - (CGFloat)MMHorizontalListViewWidthForCellAtIndex:(NSUInteger)index {
     
-    return 160;
+    return (arc4random() % 160);
 }
 
 - (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSUInteger)index {
@@ -53,7 +53,7 @@
         cell.reusableIdentifier = @"test";
     }
     
-    [cell setBackgroundColor:[UIColor blueColor]];
+    [cell setBackgroundColor:[UIColor colorWithRed:(arc4random() % 255)/255.0 green:(arc4random() % 255)/255.0 blue:(arc4random() % 255)/255.0 alpha:1.0]];
     
     return cell;
 }

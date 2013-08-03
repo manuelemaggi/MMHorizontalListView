@@ -128,9 +128,13 @@
     [_visibleCells setObject:cell forKey:frameString];
     
     CGRect cellDestinationFrame = CGRectFromString(frameString);
-    CGPoint cellCenter = CGPointMake(cellDestinationFrame.origin.x + cellDestinationFrame.size.width/2, cellDestinationFrame.size.height/2);
+
+    CGRect cellFrame = cell.frame;
+    cellFrame.size.width = cellDestinationFrame.size.width;
+    cellFrame.origin.x = cellDestinationFrame.origin.x;
+    cellFrame.origin.y = (cellDestinationFrame.size.height - cellFrame.size.height)/2;
     
-    [cell setCenter:cellCenter];
+    [cell setFrame:cellFrame];
     
     [self addSubview:cell];
 }
