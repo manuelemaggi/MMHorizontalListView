@@ -26,7 +26,7 @@
 @interface MMHorizontalListViewCell : UIView
 
 @property (nonatomic, strong) NSString *reusableIdentifier;
-@property (nonatomic, readonly, assign) NSUInteger index;
+@property (nonatomic, readonly, assign) NSInteger index;
 @property (nonatomic, readonly, assign) BOOL selected;
 @property (nonatomic, readonly, assign) BOOL highlighted;
 

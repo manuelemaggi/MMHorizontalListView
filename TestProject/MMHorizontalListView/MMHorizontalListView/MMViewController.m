@@ -49,17 +49,17 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (NSUInteger)MMHorizontalListViewNumberOfCells:(MMHorizontalListView *)horizontalListView {
+- (NSInteger)MMHorizontalListViewNumberOfCells:(MMHorizontalListView *)horizontalListView {
     
     return 100;
 }
 
-- (CGFloat)MMHorizontalListViewWidthForCellAtIndex:(NSUInteger)index {
+- (CGFloat)MMHorizontalListView:(MMHorizontalListView *)horizontalListView widthForCellAtIndex:(NSInteger)index {
     
     return (arc4random() % 160)+ 20;
 }
 
-- (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSUInteger)index {
+- (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSInteger)index {
     
     MMHorizontalListViewCell *cell = [horizontalListView dequeueCellWithReusableIdentifier:@"test"];
     
@@ -73,12 +73,12 @@
     return cell;
 }
 
-- (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index {
+- (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSInteger)index {
     
     NSLog(@"selected cell %d", index);
 }
 
-- (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSUInteger)index {
+- (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSInteger)index {
     
     NSLog(@"deselected cell %d", index);
 }

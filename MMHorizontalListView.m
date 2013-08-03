@@ -31,7 +31,7 @@
 
 // Cell class extension to access properties setter
 @interface MMHorizontalListViewCell ()
-@property (nonatomic, readwrite, assign) NSUInteger index;
+@property (nonatomic, readwrite, assign) NSInteger index;
 @end
 
 @implementation MMHorizontalListView
@@ -100,13 +100,13 @@
     
     // calculate the scrollview content size and setUp the cell destination frame list
     
-    NSUInteger numberOfCells = [self.dataSource MMHorizontalListViewNumberOfCells:self];
+    NSInteger numberOfCells = [self.dataSource MMHorizontalListViewNumberOfCells:self];
     
     CGFloat contentWidth = 0.0;
     
     for (int i=0; i < numberOfCells; i++) {
         
-        CGFloat cellWidth = [self.dataSource MMHorizontalListViewWidthForCellAtIndex:i];
+        CGFloat cellWidth = [self.dataSource MMHorizontalListView:self widthForCellAtIndex:i];
 
         CGRect cellDestinationFrame = CGRectMake(contentWidth, 0.0, cellWidth, self.frame.size.height);
 
@@ -148,12 +148,12 @@
     return reusableCell;
 }
 
-- (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)scrollToIndex:(NSInteger)index animated:(BOOL)animated {
     
     [self scrollToIndex:index animated:animated nearestPosition:MMHorizontalListViewPositionNone];
 }
 
-- (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated nearestPosition:(MMHorizontalListViewPosition)position {
+- (void)scrollToIndex:(NSInteger)index animated:(BOOL)animated nearestPosition:(MMHorizontalListViewPosition)position {
     
     [_mainLock lock];
     
@@ -193,7 +193,7 @@
     [_mainLock unlock];
 }
 
-- (void)selectCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)selectCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
     
@@ -211,7 +211,7 @@
     [_mainLock unlock];
 }
 
-- (void)deselectCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)deselectCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
     
@@ -231,7 +231,7 @@
 
 #pragma mark - Private methods
 
-- (void)addCellAtIndex:(NSUInteger)index {
+- (void)addCellAtIndex:(NSInteger)index {
     
     MMHorizontalListViewCell *cell = [self.dataSource MMHorizontalListView:self cellAtIndex:index];
     
@@ -351,7 +351,7 @@
     [_mainLock unlock];
 }
 
-- (void)highlightCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)highlightCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
     
@@ -369,7 +369,7 @@
     [_mainLock unlock];
 }
 
-- (void)unhighlightCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+- (void)unhighlightCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
     
