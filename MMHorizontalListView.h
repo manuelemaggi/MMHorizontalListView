@@ -36,8 +36,6 @@ typedef enum {
 
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index;
 
-- (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index;
-
 @end
 
 @interface MMHorizontalListView : UIScrollView <UIScrollViewDelegate> {

@@ -19,6 +19,10 @@
 @implementation MMGestureRecognizer
 @end
 
+@interface MMHorizontalListView ()
+@property (nonatomic, readwrite, assign) NSUInteger currentIndex;
+@end
+
 @implementation MMHorizontalListView
 
 @synthesize dataSource;
@@ -31,10 +35,7 @@
     self = [super initWithFrame:frame];
     if (self) {
 
-        _mainLock = [[NSRecursiveLock alloc] init];
-        _cellQueue = [[NSMutableArray alloc] init];
-        _visibleCells = [[NSMutableDictionary alloc] init];
-        _cellFrames = [[NSMutableArray alloc] init];
+        [self initiliase];
     }
     
     return self;
@@ -42,16 +43,14 @@
 
 - (void)awakeFromNib {
     
-    _mainLock = [[NSRecursiveLock alloc] init];
-    _cellQueue = [[NSMutableArray alloc] init];
-    _visibleCells = [[NSMutableDictionary alloc] init];
-    _cellFrames = [[NSMutableArray alloc] init];
+    [super awakeFromNib];
+    
+    [self initiliase];
 }
 
 - (void)dealloc {
     
 #if !__has_feature(objc_arc)
-    
     [_mainLock release];
     [_callQueue release];
     [_visibleCells release];
@@ -61,6 +60,14 @@
     
     _mainLock = nil;
     _cellQueue = nil;
+}
+
+- (void)initiliase {
+    
+    _mainLock = [[NSRecursiveLock alloc] init];
+    _cellQueue = [[NSMutableArray alloc] init];
+    _visibleCells = [[NSMutableDictionary alloc] init];
+    _cellFrames = [[NSMutableArray alloc] init];
 }
 
 #pragma mark - Public interface
@@ -202,14 +209,19 @@
     
     [_mainLock lock];
     
+    BOOL canBreak = FALSE;  // for a shorter loop... after the first match the next fail mean no more visible cells
+    
     for (int i=0; i < [_cellFrames count]; i++) {
         
         NSString *frameString = [_cellFrames objectAtIndex:i];
         CGRect cellDestinationFrame = CGRectFromString(frameString);
         
         if (CGRectIntersectsRect([self visibleRect], cellDestinationFrame)) {
-            
+            canBreak = TRUE;
             [visibleIndexes addObject:[NSNumber numberWithUnsignedInteger:i]];
+        }
+        else if (canBreak) {
+            break;
         }
     }
     
@@ -247,9 +259,14 @@
         else {
             [self addCellAtIndex:[index unsignedIntegerValue]];
         }
+        
+        // update current index
+        if (CGRectContainsRect([self visibleRect], CGRectFromString(frameString))) {
+            self.currentIndex = [index unsignedIntValue];
+        }
     }
     
-    // enqueue cells
+    // enqueue unused cells
     for (NSString *unusedCellKey in nonVisibleCellKeys) {
         
         MMHorizontalListViewCell *cell = [_visibleCells objectForKey:unusedCellKey];
@@ -312,7 +329,7 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     
     [self updateVisibleCells];
-    
+        
     if ([_horizontalListDelegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
         [_horizontalListDelegate scrollViewDidScroll:scrollView];
     }

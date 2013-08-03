@@ -69,9 +69,4 @@
     [self.horizontalView scrollToIndex:randomIndex animated:YES nearestPosition:MMHorizontalListViewPositionCenter];
 }
 
-- (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index {
-    
-}
-
-
 @end
