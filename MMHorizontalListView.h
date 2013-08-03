@@ -36,6 +36,8 @@ typedef enum {
 
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index;
 
+- (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didDeselectCellAtIndex:(NSUInteger)index;
+
 @end
 
 @interface MMHorizontalListView : UIScrollView <UIScrollViewDelegate> {
@@ -49,6 +51,7 @@ typedef enum {
     NSMutableArray *_cellQueue;
     NSMutableDictionary *_visibleCells;
     NSMutableArray *_cellFrames;
+    NSMutableArray *_selectedIndexes;
 }
 
 @property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDelegate> delegate;
@@ -63,5 +66,9 @@ typedef enum {
 - (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated;
 
 - (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated nearestPosition:(MMHorizontalListViewPosition)position;
+
+- (void)selectCellAtIndex:(NSUInteger)index animated:(BOOL)animated;
+
+- (void)deselectCellAtIndex:(NSUInteger)index animated:(BOOL)animated;
 
 @end

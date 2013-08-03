@@ -61,12 +61,11 @@
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index {
     
     NSLog(@"selected cell %d", index);
+}
+
+- (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSUInteger)index {
     
-    NSUInteger randomIndex = arc4random() % [self MMHorizontalListViewNumberOfCells:self.horizontalView];
-    
-    NSLog(@"random cell %d", randomIndex);
-    
-    [self.horizontalView scrollToIndex:randomIndex animated:YES nearestPosition:MMHorizontalListViewPositionCenter];
+    NSLog(@"deselected cell %d", index);
 }
 
 @end

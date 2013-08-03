@@ -19,10 +19,6 @@
 @implementation MMGestureRecognizer
 @end
 
-@interface MMHorizontalListView ()
-@property (nonatomic, readwrite, assign) NSUInteger currentIndex;
-@end
-
 @implementation MMHorizontalListView
 
 @synthesize dataSource;
@@ -55,6 +51,7 @@
     [_callQueue release];
     [_visibleCells release];
     [_cellFrames release];
+    [_selectedIndexes release];
     [super dealloc];
 #endif
     
@@ -68,6 +65,7 @@
     _cellQueue = [[NSMutableArray alloc] init];
     _visibleCells = [[NSMutableDictionary alloc] init];
     _cellFrames = [[NSMutableArray alloc] init];
+    _selectedIndexes = [[NSMutableArray alloc] init];
 }
 
 #pragma mark - Public interface
@@ -176,6 +174,42 @@
     [_mainLock unlock];
 }
 
+- (void)selectCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+    
+    [_mainLock lock];
+    
+    NSString *frameString = [_cellFrames objectAtIndex:index];
+    
+    if (![_selectedIndexes containsObject:frameString]) {
+        [_selectedIndexes addObject:frameString];
+    }
+    
+    MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
+    if (cell) {
+        [cell setSelected:YES animated:animated];
+    }
+    
+    [_mainLock unlock];
+}
+
+- (void)deselectCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+    
+    [_mainLock lock];
+    
+    NSString *frameString = [_cellFrames objectAtIndex:index];
+    
+    if ([_selectedIndexes containsObject:frameString]) {
+        [_selectedIndexes removeObject:frameString];
+    }
+    
+    MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
+    if (cell) {
+        [cell setSelected:NO animated:animated];
+    }
+    
+    [_mainLock unlock];
+}
+
 #pragma mark - Private methods
 
 - (void)addCellAtIndex:(NSUInteger)index {
@@ -260,10 +294,10 @@
             [self addCellAtIndex:[index unsignedIntegerValue]];
         }
         
-        // update current index
-        if (CGRectContainsRect([self visibleRect], CGRectFromString(frameString))) {
-            self.currentIndex = [index unsignedIntValue];
-        }
+        // handle selection
+        BOOL selected = [_selectedIndexes containsObject:frameString];
+        MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
+        [cell setSelected:selected animated:NO];
     }
     
     // enqueue unused cells
@@ -318,9 +352,20 @@
 - (void)cellTap:(id)sender {
     
     MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMGestureRecognizer*)sender).view;
+        
+    BOOL select = !cell.selected;
+    if (select) {
+        [self selectCellAtIndex:cell.index animated:NO];
+    }
+    else {
+        [self deselectCellAtIndex:cell.index animated:NO];
+    }
     
-    if ([_horizontalListDelegate respondsToSelector:@selector(MMHorizontalListView:didSelectCellAtIndex:)]) {
+    if (select && [_horizontalListDelegate respondsToSelector:@selector(MMHorizontalListView:didSelectCellAtIndex:)]) {
         [_horizontalListDelegate MMHorizontalListView:self didSelectCellAtIndex:cell.index];
+    }
+    else if (!select && [_horizontalListDelegate respondsToSelector:@selector(MMHorizontalListView:didDeselectCellAtIndex:)]) {
+        [_horizontalListDelegate MMHorizontalListView:self didDeselectCellAtIndex:cell.index];
     }
 }
 

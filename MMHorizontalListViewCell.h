@@ -12,5 +12,9 @@
 
 @property (nonatomic, strong) NSString *reusableIdentifier;
 @property (nonatomic, readonly, assign) NSUInteger index;
+@property (nonatomic, readonly, assign) BOOL selected;
+@property (nonatomic, readonly, assign) BOOL highlighted;
 
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated;
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated;
 @end
