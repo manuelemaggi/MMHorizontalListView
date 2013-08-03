@@ -23,9 +23,9 @@
 
 @protocol MMHorizontalListViewDelegate <UIScrollViewDelegate>
 
-- (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index;
-
 @optional
+
+- (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index;
 
 - (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index;
 

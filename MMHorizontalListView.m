@@ -8,6 +8,17 @@
 
 #import "MMHorizontalListView.h"
 
+// Cell class extension to access properties setter
+@interface MMHorizontalListViewCell ()
+@property (nonatomic, readwrite, assign) NSUInteger index;
+@end
+
+@interface MMGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation MMGestureRecognizer
+@end
+
 @implementation MMHorizontalListView
 
 @synthesize dataSource;
@@ -123,6 +134,8 @@
     
     MMHorizontalListViewCell *cell = [self.dataSource MMHorizontalListView:self cellAtIndex:index];
     
+    cell.index = index;
+    
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
     [_visibleCells setObject:cell forKey:frameString];
@@ -135,6 +148,9 @@
     cellFrame.origin.y = (cellDestinationFrame.size.height - cellFrame.size.height)/2;
     
     [cell setFrame:cellFrame];
+    
+    MMGestureRecognizer *tap = [[MMGestureRecognizer alloc] initWithTarget:self action:@selector(cellTap:)];
+    [cell addGestureRecognizer:tap];
     
     [self addSubview:cell];
 }
@@ -218,6 +234,17 @@
     [super setFrame:frame];
     
     [self reloadData];
+}
+
+#pragma mark - GestureRecognized Delegate/Action
+
+- (void)cellTap:(id)sender {
+    
+    MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMGestureRecognizer*)sender).view;
+    
+    if ([_horizontalListDelegate respondsToSelector:@selector(MMHorizontalListView:didSelectCellAtIndex:)]) {
+        [_horizontalListDelegate MMHorizontalListView:self didSelectCellAtIndex:cell.index];
+    }
 }
 
 #pragma mark - UIScrollViewDelegste

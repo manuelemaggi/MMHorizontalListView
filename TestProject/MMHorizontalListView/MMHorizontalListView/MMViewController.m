@@ -60,6 +60,7 @@
 
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index {
     
+    NSLog(@"selected cell %d", index);
 }
 
 - (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index {

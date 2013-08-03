@@ -11,5 +11,6 @@
 @interface MMHorizontalListViewCell : UIView
 
 @property (nonatomic, strong) NSString *reusableIdentifier;
+@property (nonatomic, readonly, assign) NSUInteger index;
 
 @end
