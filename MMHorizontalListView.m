@@ -126,10 +126,43 @@
 
 - (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated {
     
+    [self scrollToIndex:index animated:animated nearestPosition:MMHorizontalListViewPositionNone];
+}
+
+- (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated nearestPosition:(MMHorizontalListViewPosition)position {
+    
     [_mainLock lock];
     
     NSString *frameString = [_cellFrames objectAtIndex:index];
     CGRect cellVisibleFrame = CGRectFromString(frameString);
+    
+    switch (position) {
+            
+        case MMHorizontalListViewPositionLeft:
+            cellVisibleFrame.size = self.frame.size;
+            break;
+            
+        case MMHorizontalListViewPositionRight:
+            cellVisibleFrame.origin.x += cellVisibleFrame.size.width - self.frame.size.width;
+            cellVisibleFrame.size = self.frame.size;
+            break;
+            
+        case MMHorizontalListViewPositionCenter:
+            cellVisibleFrame.origin.x -= (self.frame.size.width - cellVisibleFrame.size.width)/2;
+            cellVisibleFrame.size = self.frame.size;
+            break;
+            
+        default:
+        case MMHorizontalListViewPositionNone:
+            break;
+    }
+    
+    if (cellVisibleFrame.origin.x < 0.0) {
+        cellVisibleFrame.origin.x = 0.0;
+    }
+    else if (cellVisibleFrame.origin.x > self.contentSize.width - self.frame.size.width) {
+        cellVisibleFrame.origin.x = self.contentSize.width - self.frame.size.width;
+    }
     
     [self scrollRectToVisible:cellVisibleFrame animated:animated];
     

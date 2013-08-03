@@ -9,6 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "MMHorizontalListViewCell.h"
 
+typedef enum {
+  
+    MMHorizontalListViewPositionNone = 0,
+    MMHorizontalListViewPositionLeft,
+    MMHorizontalListViewPositionRight,
+    MMHorizontalListViewPositionCenter,
+    
+} MMHorizontalListViewPosition;
+
 @class MMHorizontalListView;
 
 @protocol MMHorizontalListViewDataSource <NSObject>
@@ -54,5 +63,7 @@
 - (MMHorizontalListViewCell*)dequeueCellWithReusableIdentifier:(NSString*)identifier;
 
 - (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated;
+
+- (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated nearestPosition:(MMHorizontalListViewPosition)position;
 
 @end

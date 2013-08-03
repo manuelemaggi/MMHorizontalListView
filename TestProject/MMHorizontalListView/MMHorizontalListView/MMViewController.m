@@ -66,7 +66,7 @@
     
     NSLog(@"random cell %d", randomIndex);
     
-    [self.horizontalView scrollToIndex:randomIndex animated:YES];
+    [self.horizontalView scrollToIndex:randomIndex animated:YES nearestPosition:MMHorizontalListViewPositionCenter];
 }
 
 - (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index {
