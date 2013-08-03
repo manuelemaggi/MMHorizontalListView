@@ -41,7 +41,7 @@
 
 - (CGFloat)MMHorizontalListViewWidthForCellAtIndex:(NSUInteger)index {
     
-    return (arc4random() % 160);
+    return (arc4random() % 160)+ 20;
 }
 
 - (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSUInteger)index {
@@ -61,6 +61,12 @@
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSUInteger)index {
     
     NSLog(@"selected cell %d", index);
+    
+    NSUInteger randomIndex = arc4random() % [self MMHorizontalListViewNumberOfCells:self.horizontalView];
+    
+    NSLog(@"random cell %d", randomIndex);
+    
+    [self.horizontalView scrollToIndex:randomIndex animated:YES];
 }
 
 - (void)MMHorizontalListViewDidScrollToIndex:(NSUInteger)index {

@@ -126,6 +126,14 @@
 
 - (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated {
     
+    [_mainLock lock];
+    
+    NSString *frameString = [_cellFrames objectAtIndex:index];
+    CGRect cellVisibleFrame = CGRectFromString(frameString);
+    
+    [self scrollRectToVisible:cellVisibleFrame animated:animated];
+    
+    [_mainLock unlock];
 }
 
 #pragma mark - Private methods
@@ -212,11 +220,30 @@
     for (NSString *unusedCellKey in nonVisibleCellKeys) {
         
         MMHorizontalListViewCell *cell = [_visibleCells objectForKey:unusedCellKey];
-        [_cellQueue addObject:cell];
-        [cell removeFromSuperview];
-        [_visibleCells removeObjectForKey:unusedCellKey];
+        [self enqueueCell:cell forKey:unusedCellKey];
     }
     
+    [_mainLock unlock];
+}
+
+- (void)enqueueCell:(MMHorizontalListViewCell*)cell forKey:(NSString*)frameKey {
+    
+    [_mainLock lock];
+    
+    [_cellQueue addObject:cell];
+    [cell removeFromSuperview];
+    
+    NSArray *gestures = cell.gestureRecognizers;
+    for (MMGestureRecognizer *gesture in gestures) {
+        if ([gesture isKindOfClass:[MMGestureRecognizer class]]) {
+            [cell removeGestureRecognizer:gesture];
+        }
+    }
+    
+    cell.index = -1;
+    
+    [_visibleCells removeObjectForKey:frameKey];
+
     [_mainLock unlock];
 }
 
