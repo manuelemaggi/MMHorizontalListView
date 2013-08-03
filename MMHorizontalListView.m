@@ -8,15 +8,15 @@
 
 #import "MMHorizontalListView.h"
 
+@interface MMTapGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation MMTapGestureRecognizer
+@end
+
 // Cell class extension to access properties setter
 @interface MMHorizontalListViewCell ()
 @property (nonatomic, readwrite, assign) NSUInteger index;
-@end
-
-@interface MMGestureRecognizer : UITapGestureRecognizer
-@end
-
-@implementation MMGestureRecognizer
 @end
 
 @implementation MMHorizontalListView
@@ -52,6 +52,7 @@
     [_visibleCells release];
     [_cellFrames release];
     [_selectedIndexes release];
+    [_highlightedIndexes release];
     [super dealloc];
 #endif
     
@@ -66,6 +67,7 @@
     _visibleCells = [[NSMutableDictionary alloc] init];
     _cellFrames = [[NSMutableArray alloc] init];
     _selectedIndexes = [[NSMutableArray alloc] init];
+    _highlightedIndexes = [[NSMutableArray alloc] init];
 }
 
 #pragma mark - Public interface
@@ -78,6 +80,8 @@
     [[_visibleCells allValues] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [_visibleCells removeAllObjects];
     [_cellFrames removeAllObjects];
+    [_selectedIndexes removeAllObjects];
+    [_highlightedIndexes removeAllObjects];
     
     // calculate the scrollview content size and setUp the cell destination frame list
     
@@ -231,7 +235,8 @@
     
     [cell setFrame:cellFrame];
     
-    MMGestureRecognizer *tap = [[MMGestureRecognizer alloc] initWithTarget:self action:@selector(cellTap:)];
+    MMTapGestureRecognizer *tap = [[MMTapGestureRecognizer alloc] initWithTarget:self action:@selector(cellTap:)];
+    tap.delegate = self;
     [cell addGestureRecognizer:tap];
     
     [self addSubview:cell];
@@ -318,8 +323,8 @@
     [cell removeFromSuperview];
     
     NSArray *gestures = cell.gestureRecognizers;
-    for (MMGestureRecognizer *gesture in gestures) {
-        if ([gesture isKindOfClass:[MMGestureRecognizer class]]) {
+    for (MMTapGestureRecognizer *gesture in gestures) {
+        if ([gesture isKindOfClass:[MMTapGestureRecognizer class]]) {
             [cell removeGestureRecognizer:gesture];
         }
     }
@@ -328,6 +333,42 @@
     
     [_visibleCells removeObjectForKey:frameKey];
 
+    [_mainLock unlock];
+}
+
+- (void)highlightCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+    
+    [_mainLock lock];
+    
+    NSString *frameString = [_cellFrames objectAtIndex:index];
+    
+    if (![_highlightedIndexes containsObject:frameString]) {
+        [_highlightedIndexes addObject:frameString];
+    }
+    
+    MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
+    if (cell) {
+        [cell setHighlighted:YES animated:animated];
+    }
+    
+    [_mainLock unlock];
+}
+
+- (void)unhighlightCellAtIndex:(NSUInteger)index animated:(BOOL)animated {
+    
+    [_mainLock lock];
+    
+    NSString *frameString = [_cellFrames objectAtIndex:index];
+    
+    if ([_highlightedIndexes containsObject:frameString]) {
+        [_highlightedIndexes removeObject:frameString];
+    }
+    
+    MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
+    if (cell) {
+        [cell setHighlighted:NO animated:animated];
+    }
+    
     [_mainLock unlock];
 }
 
@@ -349,10 +390,40 @@
 
 #pragma mark - GestureRecognized Delegate/Action
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    
+    if ([gestureRecognizer isKindOfClass:[MMTapGestureRecognizer class]]) {
+        
+        MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMTapGestureRecognizer*)gestureRecognizer).view;
+        
+        [self highlightCellAtIndex:cell.index animated:NO];
+    }
+    
+    return TRUE;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    
+    BOOL shouldRecognize = TRUE;
+    
+    if ([gestureRecognizer isKindOfClass:[MMTapGestureRecognizer class]]) {
+        
+        MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMTapGestureRecognizer*)gestureRecognizer).view;
+        
+        [self unhighlightCellAtIndex:cell.index animated:NO];
+        
+        shouldRecognize = NO;
+    }
+    
+    return shouldRecognize;
+}
+
 - (void)cellTap:(id)sender {
     
-    MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMGestureRecognizer*)sender).view;
-        
+    MMHorizontalListViewCell *cell = (MMHorizontalListViewCell *)((MMTapGestureRecognizer*)sender).view;
+    
+    [self unhighlightCellAtIndex:cell.index animated:NO];
+    
     BOOL select = !cell.selected;
     if (select) {
         [self selectCellAtIndex:cell.index animated:NO];

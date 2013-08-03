@@ -40,7 +40,7 @@ typedef enum {
 
 @end
 
-@interface MMHorizontalListView : UIScrollView <UIScrollViewDelegate> {
+@interface MMHorizontalListView : UIScrollView <UIScrollViewDelegate, UIGestureRecognizerDelegate> {
     
     @private
     
@@ -52,6 +52,7 @@ typedef enum {
     NSMutableDictionary *_visibleCells;
     NSMutableArray *_cellFrames;
     NSMutableArray *_selectedIndexes;
+    NSMutableArray *_highlightedIndexes;
 }
 
 @property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDelegate> delegate;
