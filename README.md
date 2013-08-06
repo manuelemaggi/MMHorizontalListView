@@ -67,3 +67,26 @@ Import MMHorizontalListView (.h .m) and MMHorizontalListView (.h .m) in your pro
             NSLog(@"deselected cell %d", index);
         }
         
+4.  Selection: MMHorizontalListView provide multiple selection of cells keeping the selected state into the datasource,
+    when reloading the datasource the selection history is lost, to select/deselect a cell programmaticaly use the methods:
+
+        - (void)selectCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+        
+        and
+        
+        - (void)deselectCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+        
+
+**CELLS:**
+
+Each cell must be a MMHorizontalListViewCell subclass, the width of the cell is setted automatically when displayed, 
+buytheway the frame must be adjusted while returning the cell to the datasource. To customize the selected and highlighted state
+you should overwrite the following mehtods :
+
+        - (void)setSelected:(BOOL)selected animated:(BOOL)animated;
+        
+        and
+        
+        - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated;
+        
+if you want use animations you are responsable to implement your own animation.
