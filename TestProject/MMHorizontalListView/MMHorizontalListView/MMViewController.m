@@ -23,7 +23,10 @@
 
 #import "MMViewController.h"
 
-@interface MMViewController ()
+@interface MMViewController () {
+    
+    NSInteger numberOfCells;
+}
 
 @end
 
@@ -33,6 +36,8 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    numberOfCells = 100;
     
     [self.horizontalView setScrollEnabled:YES];
     
@@ -51,7 +56,7 @@
 
 - (NSInteger)MMHorizontalListViewNumberOfCells:(MMHorizontalListView *)horizontalListView {
     
-    return 100;
+    return numberOfCells;
 }
 
 - (CGFloat)MMHorizontalListView:(MMHorizontalListView *)horizontalListView widthForCellAtIndex:(NSInteger)index {
@@ -76,6 +81,10 @@
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSInteger)index {
     
     NSLog(@"selected cell %d", index);
+    
+    numberOfCells++;
+    
+    [horizontalListView insertCellAtIndex:index animated:YES];
 }
 
 - (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSInteger)index {

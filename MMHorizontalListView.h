@@ -181,4 +181,14 @@ typedef enum {
  */
 - (void)deselectCellAtIndex:(NSInteger)index animated:(BOOL)animated;
 
+/**
+ *
+ */
+- (void)insertCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+
+/**
+ *
+ */
+- (void)deleteCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+
 @end

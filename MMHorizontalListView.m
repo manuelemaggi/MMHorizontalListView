@@ -23,6 +23,8 @@
 
 #import "MMHorizontalListView.h"
 
+#define kInsertDeleteDuration   0.5
+
 @interface MMTapGestureRecognizer : UITapGestureRecognizer
 @end
 
@@ -199,8 +201,8 @@
     
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
-    if (![_selectedIndexes containsObject:frameString]) {
-        [_selectedIndexes addObject:frameString];
+    if (![_selectedIndexes containsObject:[NSNumber numberWithInteger:index]]) {
+        [_selectedIndexes addObject:[NSNumber numberWithInteger:index]];
     }
     
     MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
@@ -217,8 +219,8 @@
     
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
-    if ([_selectedIndexes containsObject:frameString]) {
-        [_selectedIndexes removeObject:frameString];
+    if ([_selectedIndexes containsObject:[NSNumber numberWithInteger:index]]) {
+        [_selectedIndexes removeObject:[NSNumber numberWithInteger:index]];
     }
     
     MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
@@ -227,6 +229,117 @@
     }
     
     [_mainLock unlock];
+}
+
+- (void)insertCellAtIndex:(NSInteger)index animated:(BOOL)animated {
+    
+    [_mainLock lock];
+    
+    NSInteger currentCellCount = [_cellFrames count];
+    
+    CGFloat newCellWidth = [self.dataSource MMHorizontalListView:self widthForCellAtIndex:index];
+    CGFloat newCellXOrigin = 0.0;
+    
+    NSMutableArray *pushedRightFrames = nil;
+    NSMutableDictionary *cellToPush = nil;
+    
+    if (index < currentCellCount) {
+        
+        // get the origin of the cell to insert
+        NSString *indexFrameKey = [_cellFrames objectAtIndex:index];
+        CGRect indexFrame = CGRectFromString(indexFrameKey);
+        newCellXOrigin = indexFrame.origin.x;
+        
+        // frames at the right of the index to insert
+        NSRange rightFramesRange = NSMakeRange(index, currentCellCount - index);
+        NSArray *rightFrames = [_cellFrames subarrayWithRange:rightFramesRange];
+        
+        // push the frames at the right of the index
+        pushedRightFrames = [NSMutableArray arrayWithCapacity:[rightFrames count]];
+        cellToPush = [NSMutableDictionary dictionary];
+        
+        for (NSString *frameKey in rightFrames) {
+            
+            CGRect rightFrame = CGRectFromString(frameKey);
+            rightFrame.origin.x += (newCellWidth + self.cellSpacing);
+            
+            NSString *newFrameKey = NSStringFromCGRect(rightFrame);
+            [pushedRightFrames addObject:newFrameKey];
+            
+            // visible cell to push from frameKey to newFrameKey
+            MMHorizontalListViewCell *rightCell = [_visibleCells objectForKey:frameKey];
+            
+            if (rightCell != nil) {
+                [cellToPush setObject:rightCell forKey:newFrameKey];
+                [_visibleCells removeObjectForKey:frameKey];
+            }
+        }
+    
+        // remove old frames at thre right
+        [_cellFrames removeObjectsInRange:rightFramesRange];
+        
+        [_selectedIndexes sortUsingSelector:@selector(compare:)];
+        NSInteger selectedIndex = [_selectedIndexes indexOfObject:[NSNumber numberWithInteger:index]];
+        if (selectedIndex != NSNotFound) {
+            
+            for (int i=selectedIndex; i<[_selectedIndexes count]; i++) {
+                
+                NSNumber *selected = [_selectedIndexes objectAtIndex:i];
+                selected = [NSNumber numberWithInteger:([selected integerValue]+1)];
+                [_selectedIndexes replaceObjectAtIndex:i withObject:selected];
+            }
+        }
+    }
+
+    // add the new frame to the list
+    CGRect newIndexFrame = CGRectMake(newCellXOrigin, 0.0, newCellWidth, self.frame.size.height);
+    NSString *newIndexFrameKey = NSStringFromCGRect(newIndexFrame);
+    [_cellFrames addObject:newIndexFrameKey];
+
+    // add pushed frames at the right of the new index
+    [_cellFrames addObjectsFromArray:pushedRightFrames];
+    
+    __block BOOL userInteraction = self.userInteractionEnabled;
+        
+    // push visible cells on the right
+    NSArray *toPushFrameKeys = [cellToPush allKeys];
+    for (NSString *newFrameKey in toPushFrameKeys) {
+        
+        [self setUserInteractionEnabled:NO];
+
+        // get the cell to push
+        MMHorizontalListViewCell *cell = [cellToPush objectForKey:newFrameKey];
+        [_visibleCells setObject:cell forKey:newFrameKey];
+        
+        cell.index++;
+        
+        // push with animation if needed
+        CGRect newDestinationFrame = CGRectFromString(newFrameKey);
+
+        CGRect cellFrame = cell.frame;
+        cellFrame.size.width = newDestinationFrame.size.width;
+        cellFrame.origin.x = newDestinationFrame.origin.x;
+        cellFrame.origin.y = (newDestinationFrame.size.height - cellFrame.size.height)/2;
+        
+        [UIView animateWithDuration:kInsertDeleteDuration*animated
+                              delay:0.0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             [cell setFrame:cellFrame];
+                         }
+                         completion:^(BOOL finished) {
+                             // restore the original state of user interaction
+                             [self setUserInteractionEnabled:userInteraction];
+                         }];
+    }
+    
+    [self addCellAtIndex:index];
+
+    [_mainLock unlock];
+}
+
+- (void)deleteCellAtIndex:(NSInteger)index animated:(BOOL)animated {
+    
 }
 
 #pragma mark - Private methods
@@ -315,7 +428,7 @@
         }
         
         // handle selection
-        BOOL selected = [_selectedIndexes containsObject:frameString];
+        BOOL selected = [_selectedIndexes containsObject:index];
         MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
         [cell setSelected:selected animated:NO];
     }
@@ -385,6 +498,11 @@
     }
     
     [_mainLock unlock];
+}
+
+- (void)moveCellsFromIndex:(NSInteger)index withOffset:(CGFloat)offset {
+    
+    
 }
 
 #pragma mark - Override methods
