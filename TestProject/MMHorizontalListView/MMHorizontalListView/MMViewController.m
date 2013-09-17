@@ -37,7 +37,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    numberOfCells = 100;
+    numberOfCells = 2;
     
     [self.horizontalView setScrollEnabled:YES];
     
@@ -90,6 +90,10 @@
 - (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSInteger)index {
     
     NSLog(@"deselected cell %d", index);
+    
+    [horizontalListView deleteCellAtIndex:index animated:YES];
+    
+    numberOfCells--;
 }
 
 @end

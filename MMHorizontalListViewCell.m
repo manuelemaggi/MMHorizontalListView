@@ -24,7 +24,6 @@
 #import "MMHorizontalListViewCell.h"
 
 @interface MMHorizontalListViewCell ()
-@property (nonatomic, readwrite, assign) NSInteger index;
 @property (nonatomic, readwrite, assign) BOOL selected;
 @property (nonatomic, readwrite, assign) BOOL highlighted;
 @end
