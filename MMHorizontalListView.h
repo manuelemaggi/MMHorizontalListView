@@ -120,6 +120,7 @@ typedef enum {
     NSMutableArray *_cellFrames;
     NSMutableArray *_selectedIndexes;
     NSMutableArray *_highlightedIndexes;
+    BOOL _editing;
 }
 
 @property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDelegate> delegate;     /**< The MMHorizontalListViewDelegate is conform to UIScrollView and should be implemented to handle cells selections */

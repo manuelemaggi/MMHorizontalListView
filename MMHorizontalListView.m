@@ -138,6 +138,7 @@ typedef enum {
     [_mainLock lock];
     
     NSPredicate *identifierPredicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        
         MMHorizontalListViewCell *cell = (MMHorizontalListViewCell*)evaluatedObject;
         
         return [cell.reusableIdentifier isEqualToString:identifier];
@@ -146,8 +147,8 @@ typedef enum {
     NSArray *reusableCells = [_cellQueue filteredArrayUsingPredicate:identifierPredicate];
     
     if ([reusableCells count] > 0) {
-        reusableCell = [reusableCells lastObject];
-        [_cellQueue removeObject:reusableCell];
+        reusableCell = [reusableCells objectAtIndex:0];
+        [_cellQueue removeObjectAtIndex:0];
     }
     
     [_mainLock unlock];
@@ -206,8 +207,8 @@ typedef enum {
     
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
-    if (![_selectedIndexes containsObject:[NSNumber numberWithInteger:index]]) {
-        [_selectedIndexes addObject:[NSNumber numberWithInteger:index]];
+    if (![_selectedIndexes containsObject:@(index)]) {
+        [_selectedIndexes addObject:@(index)];
     }
     
     MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
@@ -224,8 +225,8 @@ typedef enum {
     
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
-    if ([_selectedIndexes containsObject:[NSNumber numberWithInteger:index]]) {
-        [_selectedIndexes removeObject:[NSNumber numberWithInteger:index]];
+    if ([_selectedIndexes containsObject:@(index)]) {
+        [_selectedIndexes removeObject:@(index)];
     }
     
     MMHorizontalListViewCell *cell = [_visibleCells objectForKey:frameString];
@@ -239,6 +240,8 @@ typedef enum {
 - (void)insertCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
+    
+    _editing = TRUE;
     
     // get the new cell width from the data source, needed to build the new cell frame and the offset to move the cells on the right
     CGFloat newCellWidth = [self.dataSource MMHorizontalListView:self widthForCellAtIndex:index];
@@ -275,7 +278,10 @@ typedef enum {
             if (CGRectIntersectsRect([self visibleRect], newIndexFrame)) {
                 [self addCellAtIndex:index];
             }
-    }];
+        
+        _editing = FALSE;
+
+    }];    
 
     [_mainLock unlock];
 }
@@ -283,6 +289,8 @@ typedef enum {
 - (void)deleteCellAtIndex:(NSInteger)index animated:(BOOL)animated {
     
     [_mainLock lock];
+    
+    _editing = TRUE;
     
     // get the frame key of the cell to remove
     NSString *frameKey = [_cellFrames objectAtIndex:index];
@@ -292,18 +300,43 @@ typedef enum {
     if (cell) {
         [self enqueueCell:cell forKey:frameKey];
     }
-
-    // rebase the already selected indexes
-    [self rebaseSelectionFromIndex:index withOption:MM_EditingOptionDelete];
-    
-    // remove the cell's frame key from the list
-    [_cellFrames removeObjectAtIndex:index];
     
     // cell to remove's frame necessary to get the offset to move the cell on the right
     CGRect cellFrame = CGRectFromString(frameKey);
-    // move the cell on the right of the cell to remove
-    [self moveCellsFromIndex:index withOffset:-cellFrame.size.width animated:animated completion:^(BOOL finished) {
+    
+    //add the cell that will be visible after deleting the cell
+    for (int i=index+1; i<[_cellFrames count]; i++) {
         
+        NSString *nextVisibleCellFrameString = [_cellFrames objectAtIndex:i];
+        CGRect nextVisibleCellFrame = CGRectFromString(nextVisibleCellFrameString);
+        nextVisibleCellFrame.origin.x -= (cellFrame.size.width + self.cellSpacing);
+        
+        CGRect visibleRect = [self visibleRect];
+        
+        if ([_visibleCells objectForKey:nextVisibleCellFrameString]) {
+            
+            continue;   // if the cell is already visible continue to the next loop
+        }
+        else if (CGRectIntersectsRect(nextVisibleCellFrame, visibleRect)) {
+            
+            [self addCellAtIndex:i];    // if the cell will be visible add it
+        }
+        else {
+            
+            break;  // if the cell won't be visible will be the same for the rest of the cells so exit the loop
+        }
+    }
+    
+    // move the cell on the right of the cell to remove
+    [self moveCellsFromIndex:index+1 withOffset:-cellFrame.size.width animated:animated completion:^(BOOL finished) {
+        
+        // rebase the already selected indexes
+        [self rebaseSelectionFromIndex:index withOption:MM_EditingOptionDelete];
+        
+        // remove the cell's frame key from the list
+        [_cellFrames removeObjectAtIndex:index];
+        
+        _editing = FALSE;
     }];
     
     [_mainLock unlock];
@@ -324,19 +357,14 @@ typedef enum {
 - (void)addCellAtIndex:(NSInteger)index {
     
     MMHorizontalListViewCell *cell = [self.dataSource MMHorizontalListView:self cellAtIndex:index];
-        
+    
     NSString *frameString = [_cellFrames objectAtIndex:index];
     
     [_visibleCells setObject:cell forKey:frameString];
     
     CGRect cellDestinationFrame = CGRectFromString(frameString);
-
-    CGRect cellFrame = cell.frame;
-    cellFrame.size.width = cellDestinationFrame.size.width;
-    cellFrame.origin.x = cellDestinationFrame.origin.x;
-    cellFrame.origin.y = (cellDestinationFrame.size.height - cellFrame.size.height)/2;
     
-    [cell setFrame:cellFrame];
+    [cell setFrame:cellDestinationFrame];
     
     MMTapGestureRecognizer *tap = [[MMTapGestureRecognizer alloc] initWithTarget:self action:@selector(cellTap:)];
     tap.delegate = self;
@@ -425,6 +453,8 @@ typedef enum {
     [_cellQueue addObject:cell];
     [cell removeFromSuperview];
     
+    cell.frame = CGRectZero;
+    
     NSArray *gestures = cell.gestureRecognizers;
     for (MMTapGestureRecognizer *gesture in gestures) {
         if ([gesture isKindOfClass:[MMTapGestureRecognizer class]]) {
@@ -497,14 +527,7 @@ typedef enum {
             
             NSString *newFrameKey = NSStringFromCGRect(rightFrame);
             [toMoveFrames addObject:newFrameKey];
-            
-            // if the new frame will intersect the visible area add the cell
-            if (![_visibleCells objectForKey:frameKey] &&
-                CGRectIntersectsRect([self visibleRect], CGRectFromString(newFrameKey))) {
-                
-                [self addCellAtIndex:index];
-            }
-            
+
             // visible cell to move from frameKey to newFrameKey
             MMHorizontalListViewCell *rightCell = [_visibleCells objectForKey:frameKey];
             
@@ -548,14 +571,9 @@ typedef enum {
                              // push with animation if needed
                              CGRect newDestinationFrame = CGRectFromString(newFrameKey);
                              
-                             CGRect cellFrame = cell.frame;
-                             cellFrame.size.width = newDestinationFrame.size.width;
-                             cellFrame.origin.x = newDestinationFrame.origin.x;
-                             cellFrame.origin.y = (newDestinationFrame.size.height - cellFrame.size.height)/2;
+                             [cell setFrame:newDestinationFrame];
                              
-                             [cell setFrame:cellFrame];
-                             
-                             if (!CGRectIntersectsRect([self visibleRect], cellFrame)) {
+                             if (!CGRectIntersectsRect([self visibleRect], newDestinationFrame)) {
                                  [toEnqueCells setObject:cell forKey:newFrameKey];
                              }
                          }
@@ -682,7 +700,9 @@ typedef enum {
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     
-    [self updateVisibleCells];
+    if (!_editing) {
+        [self updateVisibleCells];
+    }
         
     if ([_horizontalListDelegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
         [_horizontalListDelegate scrollViewDidScroll:scrollView];
