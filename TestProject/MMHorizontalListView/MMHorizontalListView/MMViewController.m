@@ -38,7 +38,8 @@
     
     self.horizontalView.delegate = self;
     self.horizontalView.dataSource = self;
-    self.horizontalView.cellSpacing = 20.0;
+    self.horizontalView.cellSpacing = 0;
+    self.horizontalView.pagingEnabled = YES;
     
     [self.horizontalView reloadData];
 }
@@ -56,7 +57,7 @@
 
 - (CGFloat)MMHorizontalListView:(MMHorizontalListView *)horizontalListView widthForCellAtIndex:(NSInteger)index {
     
-    return (arc4random() % 160)+ 20;
+    return 320;
 }
 
 - (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSInteger)index {
@@ -64,7 +65,7 @@
     MMHorizontalListViewCell *cell = [horizontalListView dequeueCellWithReusableIdentifier:@"test"];
     
     if (!cell) {
-        cell = [[MMHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, 160, 160)];
+        cell = [[MMHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, 320, 160)];
         cell.reusableIdentifier = @"test";
     }
     
