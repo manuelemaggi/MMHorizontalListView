@@ -2,7 +2,7 @@
 //  MMViewController.m
 //  MMHorizontalListView
 //
-// Version 1.0
+// Version 1.1
 //
 // Created by Manuele Maggi on 02/08/13.
 // email: manuele.maggi@gmail.com
@@ -37,7 +37,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    numberOfCells = 2;
+    numberOfCells = 20;
     
     [self.horizontalView setScrollEnabled:YES];
     
@@ -81,19 +81,11 @@
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSInteger)index {
     
     NSLog(@"selected cell %d", index);
-    
-    numberOfCells++;
-    
-    [horizontalListView insertCellAtIndex:index animated:YES];
 }
 
 - (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSInteger)index {
     
     NSLog(@"deselected cell %d", index);
-    
-    [horizontalListView deleteCellAtIndex:index animated:YES];
-    
-    numberOfCells--;
 }
 
 @end

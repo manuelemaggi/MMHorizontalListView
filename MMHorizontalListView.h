@@ -2,7 +2,7 @@
 //  MMHorizontalListView.h
 //  MMHorizontalListView
 //
-// Version 1.0
+// Version 1.1
 //
 // Created by Manuele Maggi on 02/08/13.
 // email: manuele.maggi@gmail.com
@@ -120,11 +120,10 @@ typedef enum {
     NSMutableArray *_cellFrames;
     NSMutableArray *_selectedIndexes;
     NSMutableArray *_highlightedIndexes;
-    BOOL _editing;
 }
 
-@property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDelegate> delegate;     /**< The MMHorizontalListViewDelegate is conform to UIScrollView and should be implemented to handle cells selections */
-@property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDataSource> dataSource; /**< The list datasource MUST be implemented to populate the list */
+@property (nonatomic, weak) id<MMHorizontalListViewDelegate> delegate;     /**< The MMHorizontalListViewDelegate is conform to UIScrollView and should be implemented to handle cells selections */
+@property (nonatomic, weak) id<MMHorizontalListViewDataSource> dataSource; /**< The list datasource MUST be implemented to populate the list */
 
 @property (nonatomic, assign) CGFloat cellSpacing;  /**< spacing between cells, the default value is 0.0f */
 
@@ -181,15 +180,5 @@ typedef enum {
  *  @param animated - deselect the cell using animation (the cell it self has to implement the animation)
  */
 - (void)deselectCellAtIndex:(NSInteger)index animated:(BOOL)animated;
-
-/**
- *
- */
-- (void)insertCellAtIndex:(NSInteger)index animated:(BOOL)animated;
-
-/**
- *
- */
-- (void)deleteCellAtIndex:(NSInteger)index animated:(BOOL)animated;
 
 @end

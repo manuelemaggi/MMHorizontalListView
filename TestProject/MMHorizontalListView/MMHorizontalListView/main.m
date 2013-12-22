@@ -2,7 +2,7 @@
 //  main.m
 //  MMHorizontalListView
 //
-// Version 1.0
+// Version 1.1
 //
 // Created by Manuele Maggi on 02/08/13.
 // email: manuele.maggi@gmail.com
