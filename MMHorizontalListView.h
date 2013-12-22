@@ -2,7 +2,7 @@
 //  MMHorizontalListView.h
 //  MMHorizontalListView
 //
-// Version 1.1
+// Version 1.0
 //
 // Created by Manuele Maggi on 02/08/13.
 // email: manuele.maggi@gmail.com
@@ -120,10 +120,11 @@ typedef enum {
     NSMutableArray *_cellFrames;
     NSMutableArray *_selectedIndexes;
     NSMutableArray *_highlightedIndexes;
+    BOOL _editing;
 }
 
-@property (nonatomic, weak) id<MMHorizontalListViewDelegate> delegate;     /**< The MMHorizontalListViewDelegate is conform to UIScrollView and should be implemented to handle cells selections */
-@property (nonatomic, weak) id<MMHorizontalListViewDataSource> dataSource; /**< The list datasource MUST be implemented to populate the list */
+@property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDelegate> delegate;     /**< The MMHorizontalListViewDelegate is conform to UIScrollView and should be implemented to handle cells selections */
+@property (nonatomic, unsafe_unretained) id<MMHorizontalListViewDataSource> dataSource; /**< The list datasource MUST be implemented to populate the list */
 
 @property (nonatomic, assign) CGFloat cellSpacing;  /**< spacing between cells, the default value is 0.0f */
 
@@ -180,5 +181,25 @@ typedef enum {
  *  @param animated - deselect the cell using animation (the cell it self has to implement the animation)
  */
 - (void)deselectCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+
+/**
+ *  Method to insert a cell at a specific index
+ *  
+ *  this method insert a cell at the given index reloading the datasource only for the visible cells including the new one
+ *
+ *  @param index - the given index to insert the new cell in the datasource
+ *  @param animated - perform the insert using an animation
+ */
+- (void)insertCellAtIndex:(NSInteger)index animated:(BOOL)animated;
+
+/**
+ *  Method to insert a cell at a specific index
+ *
+ *  this method insert a cell at the given index reloading the datasource only for the visible cells including the new one
+ *
+ *  @param index - the given index to insert the new cell in the datasource
+ *  @param animated - perform the insert using an animation
+ */
+- (void)deleteCellAtIndex:(NSInteger)index animated:(BOOL)animated;
 
 @end

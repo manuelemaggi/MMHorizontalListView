@@ -61,7 +61,7 @@
 
 - (CGFloat)MMHorizontalListView:(MMHorizontalListView *)horizontalListView widthForCellAtIndex:(NSInteger)index {
     
-    return (arc4random() % 160)+ 20;
+    return 160;
 }
 
 - (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSInteger)index {
@@ -69,7 +69,7 @@
     MMHorizontalListViewCell *cell = [horizontalListView dequeueCellWithReusableIdentifier:@"test"];
     
     if (!cell) {
-        cell = [[MMHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, 160, 160)];
+        cell = [[MMHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, 160, horizontalListView.frame.size.height)];
         cell.reusableIdentifier = @"test";
     }
     
@@ -81,11 +81,19 @@
 - (void)MMHorizontalListView:(MMHorizontalListView*)horizontalListView didSelectCellAtIndex:(NSInteger)index {
     
     NSLog(@"selected cell %d", index);
+    
+    numberOfCells++;
+    
+    [horizontalListView insertCellAtIndex:index animated:YES];
 }
 
 - (void)MMHorizontalListView:(MMHorizontalListView *)horizontalListView didDeselectCellAtIndex:(NSInteger)index {
     
     NSLog(@"deselected cell %d", index);
+    
+    [horizontalListView deleteCellAtIndex:index animated:YES];
+    
+    numberOfCells--;
 }
 
 @end
