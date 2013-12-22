@@ -116,7 +116,7 @@
         [_cellFrames addObject:NSStringFromCGRect(cellDestinationFrame)];
     }
     
-    self.contentSize = CGSizeMake(contentWidth, self.frame.size.height);
+    self.contentSize = CGSizeMake(contentWidth, self.frame.size.height - self.contentInset.top);
     
     // add the visible cells
     [self updateVisibleCells];

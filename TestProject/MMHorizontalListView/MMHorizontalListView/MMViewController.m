@@ -22,6 +22,7 @@
 //
 
 #import "MMViewController.h"
+#import "MMLabelHorizontalListViewCell.h"
 
 @interface MMViewController ()
 
@@ -29,10 +30,15 @@
 
 @implementation MMViewController
 
+- (void)scroll {
+    [self.horizontalView scrollToIndex:99 animated:YES];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Scroll", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(scroll)];
     
     [self.horizontalView setScrollEnabled:YES];
     
@@ -57,17 +63,18 @@
 
 - (CGFloat)MMHorizontalListView:(MMHorizontalListView *)horizontalListView widthForCellAtIndex:(NSInteger)index {
     
-    return 320;
+    return CGRectGetWidth(self.view.frame);
 }
 
 - (MMHorizontalListViewCell*)MMHorizontalListView:(MMHorizontalListView *)horizontalListView cellAtIndex:(NSInteger)index {
     
-    MMHorizontalListViewCell *cell = [horizontalListView dequeueCellWithReusableIdentifier:@"test"];
+    MMLabelHorizontalListViewCell *cell = (MMLabelHorizontalListViewCell *)[horizontalListView dequeueCellWithReusableIdentifier:@"test"];
     
     if (!cell) {
-        cell = [[MMHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, 320, 160)];
+        cell = [[MMLabelHorizontalListViewCell alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
         cell.reusableIdentifier = @"test";
     }
+    [cell.label setText:[NSString stringWithFormat:@"index : %d", index]];
     
     [cell setBackgroundColor:[UIColor colorWithRed:(arc4random() % 255)/255.0 green:(arc4random() % 255)/255.0 blue:(arc4random() % 255)/255.0 alpha:1.0]];
     
