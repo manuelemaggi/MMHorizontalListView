@@ -21,6 +21,7 @@
 		32DCC6E317AC578900D3EE96 /* MMHorizontalListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DCC6E217AC578900D3EE96 /* MMHorizontalListView.m */; };
 		32DCC6E617AC582F00D3EE96 /* MMHorizontalListViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 32DCC6E517AC582F00D3EE96 /* MMHorizontalListViewCell.m */; };
 		32DCC6E917AC8DBF00D3EE96 /* MMViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32DCC6E717AC8DBF00D3EE96 /* MMViewController_iPad.xib */; };
+		ABE5BCE51866734900EFB55E /* MMLabelHorizontalListViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE5BCE41866734900EFB55E /* MMLabelHorizontalListViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,8 @@
 		32DCC6E417AC582F00D3EE96 /* MMHorizontalListViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMHorizontalListViewCell.h; path = ../../../MMHorizontalListViewCell.h; sourceTree = "<group>"; };
 		32DCC6E517AC582F00D3EE96 /* MMHorizontalListViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMHorizontalListViewCell.m; path = ../../../MMHorizontalListViewCell.m; sourceTree = "<group>"; };
 		32DCC6E817AC8DBF00D3EE96 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MMViewController_iPad.xib; sourceTree = "<group>"; };
+		ABE5BCE31866734900EFB55E /* MMLabelHorizontalListViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLabelHorizontalListViewCell.h; sourceTree = "<group>"; };
+		ABE5BCE41866734900EFB55E /* MMLabelHorizontalListViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMLabelHorizontalListViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +99,8 @@
 				32DCC6CA17AC56EF00D3EE96 /* MMAppDelegate.m */,
 				32DCC6D217AC56EF00D3EE96 /* MMViewController.h */,
 				32DCC6D317AC56EF00D3EE96 /* MMViewController.m */,
+				ABE5BCE31866734900EFB55E /* MMLabelHorizontalListViewCell.h */,
+				ABE5BCE41866734900EFB55E /* MMLabelHorizontalListViewCell.m */,
 				32DCC6D517AC56EF00D3EE96 /* MMViewController_iPhone.xib */,
 				32DCC6E717AC8DBF00D3EE96 /* MMViewController_iPad.xib */,
 				32DCC6C117AC56EF00D3EE96 /* Supporting Files */,
@@ -202,6 +207,7 @@
 				32DCC6D417AC56EF00D3EE96 /* MMViewController.m in Sources */,
 				32DCC6E317AC578900D3EE96 /* MMHorizontalListView.m in Sources */,
 				32DCC6E617AC582F00D3EE96 /* MMHorizontalListViewCell.m in Sources */,
+				ABE5BCE51866734900EFB55E /* MMLabelHorizontalListViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
